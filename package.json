@@ -1,0 +1,14 @@
+{
+  "name": "Annotator",
+  "version": "0.0.1",
+  "description": "Video commenting app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "vivekananda kalidindi",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.1.1"
+  }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Annotator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="FilesSection">
+    <div id="FilesResizer"></div>
+    <div id="AddFilesBtn"> ADD FILES</div>
+    <div id="SortContainer">
+      <div id="SortUpBtn" onclick="sortFilesAlphabetically(1)">SORT &uarr;</div>
+      <div id="SortDownBtn" onclick="sortFilesAlphabetically(-1)">SORT &darr;</div>
+    </div>
+    <div id="FilesContainer">
+    </div>
+    <div id="ClearFilesBtn" onclick = "clearAllFiles()" >CLEAR ALL &nbsp; &#9932;</div>
+  </div>
+  <input id="colorPicker" type="color" style="display:none;"/>
+  <div id="prefWindowContainer" style="display:none;">
+    <div id="prefMask"></div>
+   <div id="prefWindow">  
+    <span>FPS </span><input class="prefInputs" type="text" value="24" />
+    <span>Tag-1 </span><input class="prefInputs" type="text" value="Storyboard" />
+    <span>Tag-2 </span><input class="prefInputs" type="text" value="Asset" />
+    <span>Tag-3 </span><input class="prefInputs" type="text" value="Animation" />
+    <span>Tag-4 </span><input class="prefInputs" type="text" value="Edit" />
+    <button style="left:65px;" onclick="saveTags();savePrefs();">Save</button>
+    <button style="right:65px;" onclick="prefWindow.style.display='none';">Cancel</button>
+   </div>
+  </div>
+  <div id="leftLayout">
+    <div id="videoControlContainer">
+      <div id="videoContainer">
+        <div id="toolsContainer">
+          <div id="tt1" class="tool selection" data-toolid="1" onclick="changeTool(this)" style="background-image: url('icons/cursor.png');"></div>
+          <div id="tt2" class="tool" data-toolid="2"  onclick="changeTool(this)" style="background-image: url('icons/brush.png');"></div>
+          <div id="tt3" class="tool" data-toolid="3"  onclick="changeTool(this)" style="background-image: url('icons/rubber.png');"></div>
+          <div class="tool" onclick="Fill()" style="background-image: url('icons/fill.png');"></div>
+          <div class="tool" onclick="Clear()"  style="background-image: url('icons/clear.png');"></div>
+          <div class="tool" onclick="undo()" style="background-image: url('icons/undo.png');"></div>
+          <div class="tool" onclick="redo()"  style="background-image: url('icons/redo.png');"></div>
+          <div class="gap"></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick colorSelect" style="background:black" data-color="#000000"></div></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick" style="background:white" data-color="#ffffff"></div></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick" style="background:#ff4242" data-color="#ff4242"></div></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick" style="background:#4258ff" data-color="#4258ff"></div></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick" style="background:#42ff8a" data-color="#42ff8a"></div></div>
+          <div class="colorTool" onclick="changeColor(this)"><div class="colorPick" style="background:#fbff42" data-color="#fbff42"></div></div>
+          <input type="range" min="10" max="200" value="10" class="slider" id="sizeRange"  onchange="sizeChanged(this)">
+          <input type="range" min="1" max="100" value="100" class="slider" id="opacityRange" onchange="opacityChanged(this)" style="display:none;">
+          <div id="flipBtn" onclick="videoFlip = !videoFlip; addFxToVideo();" class="tool right" style="background-image: url('icons/flip.png');"></div>
+          <div id="bwBtn" onclick="videoBW = !videoBW; addFxToVideo();" class="tool right" style="background-image: url('icons/bw.png');"></div>
+        </div>
+        <div id="leftToolBar" style="display:none;">
+          <div class="sideTool" onclick="saveCorrections();" style="background-image: url('icons/save.png');"></div>
+          <div class="sideTool" onclick="iniExport();" style="background-image: url('icons/export.png');"></div>
+          <div class="sideTool" onclick="uniExport();" style="background-image: url('icons/export.png');"></div>
+        </div>
+        <div id="timelineParent">
+        <div id="timeline">
+          <div id="timeSlider"></div>
+          <div id="currentTimecode">00:00:00</div>
+          <div id="durationTimecode">00:00:00</div>
+          <div id="commentVisData"></div>
+        </div>
+          <div id="controlsContainer">
+            <div class="control" onclick="playToggle();" style="background-image: url('icons/play.png');"></div>
+            <div class="smallControl" onclick="pushFrame(1);" style="background-image: url('icons/prevFrame.png'); margin-left:-110px;"></div>
+            <div class="smallControl flipHorizontal" onclick="pushFrame(-1);" style="background-image: url('icons/prevFrame.png'); margin-left:40px;"></div>
+            <div class="smallControl" onclick="pushToComment(1);" style="background-image: url('icons/prevComment.png'); margin-left:-185px;"></div>
+            <div class="smallControl flipHorizontal" onclick="pushToComment(-1);" style="background-image: url('icons/prevComment.png'); margin-left:115px;"></div>
+            <div class="smallControl" onclick="pushToEnds(-1);" style="background-image: url('icons/end.png'); margin-left:200px;"></div>
+            <div class="smallControl flipHorizontal" onclick="pushToEnds(1);" style="background-image: url('icons/end.png'); margin-left:-270px;"></div>
+          </div>
+        </div>
+        
+        
+        
+        <div id="video">
+          <video preload="auto" src="" width="320" height="240"  type="video/mp4"></video>
+          </div>
+          <div id="paintCursor"><div></div></div>
+          <canvas  id="DrawingCanvas">
+          </canvas >
+        </div>
+      </div>
+    </div>
+  <div id="rightLayout">
+      <div id="commentResizer"></div>
+      <div id="commentsContainer" onscroll="updateTimes()">
+           <div id="commentStart">START</div>
+           <div id="commentEnd">END</div>
+      </div>
+        <div id="grad1"></div>
+        <div id="tab1" class="tabs tabSelected" onclick="changeTypeClicked(0);">PENDING<div id="pendingno">0</div></div>
+        <div id="tab2" class="tabs"  onclick="changeTypeClicked(1);">COMPLETED<div id="completedno">0</div></div>
+        <select id="categSelector" name="categ" onchange="changeCategClicked(this)">
+          <option value="0">All</option>
+          <option id="tag1" value="8">Storyboard</option>
+          <option id="tag2" value="4">Asset</option>
+          <option id="tag3" value="2">Animation</option>
+          <option id="tag4" value="1">Edit</option>
+        </select>
+      <div id="centerMarker" onclick="newCommentClicked();"></div>
+    </div>
+<div id="NotifContainer" class="popup">
+  <center>
+  <span id="Notif">
+    Fully Loaded
+  </span>
+</center>
+</div>
+
+  <script src="Sortable.js"></script>
+  <script src="Initilize.js"></script> 
+  <script src="Utils.js"></script>
+  <script src="WindowManager.js"></script>
+  <script src="FileInputManager.js"></script>
+  <script src="ControlsManager.js"></script> 
+  <script src="VideoManager.js"></script>  
+  <script src="CanvasManager.js"></script>
+  <script src="CommentsManager.js"></script>
+  <script src="SaveLoadManager.js"></script>
+  <script type="text/javascript">
+  loadPrefs();
+  </script>
+  <canvas  id="ExportCanvas"  width="2220" height="1080" style="display:none;"></canvas >
+  </body>
+  </html>
